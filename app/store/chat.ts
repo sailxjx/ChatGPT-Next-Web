@@ -386,27 +386,27 @@ export const useChatStore = createPersistStore(
         const contextPrompts = session.mask.context.slice();
 
         // system prompts, to get close to OpenAI Web ChatGPT
-        const shouldInjectSystemPrompts = modelConfig.enableInjectSystemPrompts;
+        const shouldInjectSystemPrompts =
+          modelConfig.enableInjectSystemPrompts &&
+          session.mask.modelConfig.model.startsWith("gpt-");
 
         var systemPrompts: ChatMessage[] = [];
-        if (modelConfig.model !== "gemini-pro") {
-          systemPrompts = shouldInjectSystemPrompts
-            ? [
-                createMessage({
-                  role: "system",
-                  content: fillTemplateWith("", {
-                    ...modelConfig,
-                    template: DEFAULT_SYSTEM_TEMPLATE,
-                  }),
+        systemPrompts = shouldInjectSystemPrompts
+          ? [
+              createMessage({
+                role: "system",
+                content: fillTemplateWith("", {
+                  ...modelConfig,
+                  template: DEFAULT_SYSTEM_TEMPLATE,
                 }),
-              ]
-            : [];
-          if (shouldInjectSystemPrompts) {
-            console.log(
-              "[Global System Prompt] ",
-              systemPrompts.at(0)?.content ?? "empty",
-            );
-          }
+              }),
+            ]
+          : [];
+        if (shouldInjectSystemPrompts) {
+          console.log(
+            "[Global System Prompt] ",
+            systemPrompts.at(0)?.content ?? "empty",
+          );
         }
 
         // long term memory
